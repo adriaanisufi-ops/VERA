@@ -1,0 +1,58 @@
+<!doctype html>
+<html lang="nl">
+<head>
+  <meta charset="utf-8" />
+  <meta name="viewport" content="width=device-width, initial-scale=1" />
+  <title>Deel jouw verhaal</title>
+  <style>
+    body { font-family: system-ui, Arial; max-width: 900px; margin: 40px auto; padding: 16px; }
+    a { text-decoration:none; }
+    input, textarea, button { width:100%; padding:12px; border-radius:12px; border:1px solid #ddd; font: inherit; }
+    button { cursor:pointer; }
+    .row { display:grid; gap:12px; margin-top:16px; }
+    .msg { margin-top: 12px; }
+  </style>
+</head>
+<body>
+  <p><a href="index.html">← Terug</a></p>
+  <h1>Deel jouw verhaal</h1>
+
+  <form id="form" class="row">
+    <input id="title" placeholder="Titel" required />
+    <input id="author" placeholder="Jouw naam (optioneel)" />
+    <textarea id="content" rows="10" placeholder="Jouw verhaal..." required></textarea>
+    <button type="submit">Plaatsen</button>
+  </form>
+
+  <div id="msg" class="msg"></div>
+
+  <script src="supabase.js"></script>
+  <script>
+    const form = document.getElementById("form");
+    const msg = document.getElementById("msg");
+
+    form.addEventListener("submit", async (e) => {
+      e.preventDefault();
+      msg.textContent = "Verhaal plaatsen...";
+
+      const title = document.getElementById("title").value.trim();
+      const author = document.getElementById("author").value.trim();
+      const content = document.getElementById("content").value.trim();
+
+      const { error } = await supabase.from("stories").insert({
+        title,
+        author_name: author || null,
+        content
+      });
+
+      if (error) {
+        msg.textContent = "Fout: " + error.message;
+        return;
+      }
+
+      msg.textContent = "Gelukt! Terug naar de homepage...";
+      setTimeout(() => (window.location.href = "index.html"), 800);
+    });
+  </script>
+</body>
+</html>
