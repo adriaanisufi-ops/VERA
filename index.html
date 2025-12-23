@@ -634,7 +634,11 @@
 
   updateAuthButton();
   window.supabaseClient.auth.onAuthStateChange(() => updateAuthButton());
-    loadStories();
+// Fix voor "Terug" / back button (bfcache): page kan uit cache komen zonder scripts opnieuw te runnen
+window.addEventListener("pageshow", () => {
+  updateAuthButton();
+  loadStories();
+});
   </script>
 
 </body>
