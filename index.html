@@ -12,11 +12,11 @@
 
   <style>
     :root{
-      --bg: #0b1020;
+      --bg:#0b1020;
       --bg2:#0f1732;
       --card: rgba(255,255,255,.06);
       --card2: rgba(255,255,255,.08);
-      --text: #eef2ff;
+      --text:#eef2ff;
       --muted: rgba(238,242,255,.70);
       --border: rgba(255,255,255,.12);
       --accent:#8b5cf6;
@@ -128,9 +128,7 @@
       opacity: 0;
       animation: fadeUp .35s ease forwards;
     }
-    @keyframes fadeUp{
-      to{ transform: translateY(0); opacity:1; }
-    }
+    @keyframes fadeUp{ to{ transform: translateY(0); opacity:1; } }
 
     .story-head{ padding: 16px 16px 8px; }
     .story h2{
@@ -139,8 +137,9 @@
       letter-spacing: -0.02em;
       line-height: 1.25;
     }
+
     .meta{
-      margin-top: 8px;
+      margin-top: 10px;
       color: var(--muted);
       font-size: 13px;
       display:flex;
@@ -148,6 +147,7 @@
       flex-wrap: wrap;
       align-items:center;
     }
+
     .pill{
       display:inline-flex;
       align-items:center;
@@ -158,6 +158,17 @@
       background: rgba(255,255,255,.06);
       font-size: 12px;
       color: var(--muted);
+    }
+
+    .tag{
+      border-color: rgba(34,211,238,.28);
+      background: rgba(34,211,238,.10);
+      color: rgba(238,242,255,.85);
+    }
+    .cat{
+      border-color: rgba(139,92,246,.28);
+      background: rgba(139,92,246,.12);
+      color: rgba(238,242,255,.90);
     }
 
     .story-body{
@@ -176,7 +187,28 @@
       border-top: 1px solid var(--border);
       background: rgba(255,255,255,.04);
     }
+    .left-actions{ display:flex; gap:10px; align-items:center; flex-wrap: wrap; }
     .small{ font-size: 13px; color: var(--muted); }
+
+    /* Like button */
+    .like{
+      display:inline-flex;
+      align-items:center;
+      gap:8px;
+      padding: 8px 12px;
+      border-radius: 999px;
+      border: 1px solid var(--border);
+      background: rgba(255,255,255,.06);
+      color: var(--text);
+      cursor:pointer;
+      transition: transform .12s ease, background .12s ease, border-color .12s ease, opacity .12s ease;
+    }
+    .like:hover{ transform: translateY(-1px); background: rgba(255,255,255,.09); }
+    .like:active{ transform: translateY(0px); opacity:.92; }
+    .like.active{
+      border-color: rgba(251,113,133,.40);
+      background: rgba(251,113,133,.16);
+    }
 
     /* Comments */
     .comments{
@@ -194,7 +226,12 @@
       margin-top: 10px;
       background: rgba(255,255,255,.06);
     }
-    .comment p{ margin: 8px 0 0; white-space: pre-wrap; line-height: 1.55; color: rgba(238,242,255,.92); }
+    .comment p{
+      margin: 8px 0 0;
+      white-space: pre-wrap;
+      line-height: 1.55;
+      color: rgba(238,242,255,.92);
+    }
 
     .form{ margin-top: 12px; display:grid; gap:10px; }
     input, textarea{
@@ -209,7 +246,6 @@
     }
     input::placeholder, textarea::placeholder{ color: rgba(238,242,255,.55); }
     textarea{ min-height: 110px; resize: vertical; }
-
     .row{ display:flex; gap:10px; align-items:center; justify-content:flex-end; flex-wrap: wrap; }
     .hint{ color: var(--muted); font-size: 13px; }
 
@@ -223,19 +259,19 @@
       .story-head, .story-body, .story-actions, .comments{ padding-left: 12px; padding-right: 12px; }
     }
 
-    /* Reduced motion */
     @media (prefers-reduced-motion: reduce){
       .story{ animation: none; opacity:1; transform:none; }
-      .btn{ transition:none; }
+      .btn, .like{ transition:none; }
     }
   </style>
 </head>
+
 <body>
   <div class="container">
     <div class="topbar">
       <div class="brand">
         <h1>Verhalen</h1>
-        <p>Lees, deel en reageer — met respect.</p>
+        <p>Lees, deel, like en reageer — met respect.</p>
       </div>
       <a class="btn btn-primary" href="deel.html">Deel jouw verhaal</a>
     </div>
@@ -245,55 +281,124 @@
     <div id="stories"></div>
   </div>
 
+  <!-- Supabase -->
   <script src="https://cdn.jsdelivr.net/npm/@supabase/supabase-js@2"></script>
   <script src="supabase.js"></script>
 
   <script>
-    function escapeHtml(str){return (str??"").replace(/[&<>"']/g,m=>({"&":"&amp;","<":"&lt;",">":"&gt;",'"':"&quot;","'":"&#039;"}[m]))}
-    function fmtDate(ts){ try { return new Date(ts).toLocaleString("nl-NL"); } catch { return ""; } }
+    // ---------- helpers ----------
+    function escapeHtml(str){
+      return (str ?? "").replace(/[&<>"']/g, (m) => ({
+        "&":"&amp;","<":"&lt;",">":"&gt;",'"':"&quot;","'":"&#039;"
+      }[m]));
+    }
+    function fmtDate(ts){
+      try { return new Date(ts).toLocaleString("nl-NL"); }
+      catch { return ""; }
+    }
+    function ensureVisitorId(){
+      let id = localStorage.getItem("visitor_id");
+      if (!id) {
+        id = (crypto?.randomUUID?.() || ("v_" + Math.random().toString(16).slice(2) + Date.now()));
+        localStorage.setItem("visitor_id", id);
+      }
+      return id;
+    }
+    const VISITOR_ID = ensureVisitorId();
 
-    async function loadStories(){
-      const statusEl=document.getElementById("status");
-      const errorEl=document.getElementById("error");
-      const wrap=document.getElementById("stories");
-      errorEl.textContent=""; wrap.innerHTML="";
+    function normalizeTags(tags){
+      if (!tags) return [];
+      if (Array.isArray(tags)) return tags.filter(Boolean).map(t => String(t).trim()).filter(Boolean);
+      // fallback if it ever comes as string
+      return String(tags).split(",").map(t => t.trim()).filter(Boolean);
+    }
 
-      try{
-        if(!window.supabaseClient) throw new Error("Supabase client niet geladen. Controleer supabase.js");
+    // ---------- main ----------
+    async function loadStories() {
+      const statusEl = document.getElementById("status");
+      const errorEl = document.getElementById("error");
+      const wrap = document.getElementById("stories");
 
-        const { data, error } = await window.supabaseClient
+      errorEl.textContent = "";
+      wrap.innerHTML = "";
+      statusEl.textContent = "Verhalen laden...";
+
+      try {
+        if (!window.supabaseClient) throw new Error("Supabase client niet geladen. Controleer supabase.js.");
+
+        // 1) haal stories
+        const { data: stories, error: sErr } = await window.supabaseClient
           .from("stories")
-          .select("id,title,author_name,created_at,content")
-          .order("created_at",{ascending:false})
+          .select("id,title,author_name,created_at,content,category,tags")
+          .order("created_at", { ascending: false })
           .limit(50);
 
-        if(error) throw error;
+        if (sErr) throw sErr;
 
-        if(!data || data.length===0){
-          statusEl.textContent="Nog geen verhalen. Wees de eerste!";
+        if (!stories || stories.length === 0) {
+          statusEl.textContent = "Nog geen verhalen. Wees de eerste!";
           return;
         }
 
-        statusEl.textContent="";
+        statusEl.textContent = "";
 
-        data.forEach((s, i)=>{
-          const el=document.createElement("section");
-          el.className="story";
-          el.style.animationDelay = (i * 30) + "ms";
-          el.innerHTML=`
+        // 2) haal alle likes (count + welke stories geliked door visitor)
+        const storyIds = stories.map(s => s.id);
+
+        const { data: allLikes, error: lErr } = await window.supabaseClient
+          .from("likes")
+          .select("story_id,visitor_id")
+          .in("story_id", storyIds);
+
+        if (lErr) throw lErr;
+
+        const likeCounts = new Map();     // story_id -> count
+        const likedByMe = new Set();      // story_id set
+
+        (allLikes || []).forEach(l => {
+          likeCounts.set(l.story_id, (likeCounts.get(l.story_id) || 0) + 1);
+          if (l.visitor_id === VISITOR_ID) likedByMe.add(l.story_id);
+        });
+
+        // 3) render
+        stories.forEach((s, i) => {
+          const tags = normalizeTags(s.tags);
+          const category = (s.category || "Algemeen").trim();
+          const likes = likeCounts.get(s.id) || 0;
+          const isLiked = likedByMe.has(s.id);
+
+          const el = document.createElement("section");
+          el.className = "story";
+          el.style.animationDelay = (i * 28) + "ms";
+
+          el.innerHTML = `
             <div class="story-head">
               <h2>${escapeHtml(s.title)}</h2>
               <div class="meta">
                 <span class="pill">🗓️ ${fmtDate(s.created_at)}</span>
-                ${s.author_name ? `<span class="pill">👤 ${escapeHtml(s.author_name)}</span>` : ""}
+                ${s.author_name ? `<span class="pill">👤 ${escapeHtml(s.author_name)}</span>` : `<span class="pill">👤 Anoniem</span>`}
+                <span class="pill cat">🏷️ ${escapeHtml(category)}</span>
+                ${tags.slice(0, 8).map(t => `<span class="pill tag">#${escapeHtml(t)}</span>`).join("")}
               </div>
             </div>
 
             <div class="story-body">${escapeHtml(s.content)}</div>
 
             <div class="story-actions">
-              <button class="btn" data-action="toggle-comments" data-story="${s.id}">💬 Reacties</button>
-              <span class="small" id="count-${s.id}"></span>
+              <div class="left-actions">
+                <button class="like ${isLiked ? "active" : ""}" data-action="toggle-like" data-story="${s.id}">
+                  <span>❤️</span>
+                  <span id="like-count-${s.id}">${likes}</span>
+                </button>
+
+                <button class="btn" data-action="toggle-comments" data-story="${s.id}">
+                  💬 Reacties
+                </button>
+
+                <span class="small" id="comment-count-${s.id}"></span>
+              </div>
+
+              <span class="small"> </span>
             </div>
 
             <div class="comments" id="comments-${s.id}">
@@ -310,108 +415,169 @@
               </form>
             </div>
           `;
+
           wrap.appendChild(el);
         });
 
-        wrap.addEventListener("click", async (e)=>{
-          const btn=e.target.closest("[data-action='toggle-comments']");
-          if(!btn) return;
-          const storyId=btn.getAttribute("data-story");
-          const panel=document.getElementById(`comments-${storyId}`);
-          const isOpen=panel.classList.toggle("open");
-          btn.textContent = isOpen ? "🙈 Verbergen" : "💬 Reacties";
-          if(isOpen) await loadComments(storyId);
+        // events (delegation)
+        wrap.addEventListener("click", async (e) => {
+          const likeBtn = e.target.closest("[data-action='toggle-like']");
+          if (likeBtn) {
+            const storyId = likeBtn.getAttribute("data-story");
+            await toggleLike(storyId, likeBtn);
+            return;
+          }
+
+          const cBtn = e.target.closest("[data-action='toggle-comments']");
+          if (cBtn) {
+            const storyId = cBtn.getAttribute("data-story");
+            const panel = document.getElementById(`comments-${storyId}`);
+            const isOpen = panel.classList.toggle("open");
+            cBtn.textContent = isOpen ? "🙈 Verbergen" : "💬 Reacties";
+            if (isOpen) await loadComments(storyId);
+            return;
+          }
         });
 
-        wrap.addEventListener("submit", async (e)=>{
-          const form=e.target.closest("[data-action='comment-form']");
-          if(!form) return;
+        wrap.addEventListener("submit", async (e) => {
+          const form = e.target.closest("[data-action='comment-form']");
+          if (!form) return;
           e.preventDefault();
-          const storyId=form.getAttribute("data-story");
+          const storyId = form.getAttribute("data-story");
           await submitComment(form, storyId);
         });
 
-        data.forEach(s => loadCommentCount(s.id));
+        // preload comment counts
+        storyIds.forEach(id => loadCommentCount(id));
 
-      }catch(err){
+      } catch (err) {
         console.error(err);
-        statusEl.textContent="";
-        errorEl.textContent="Fout:\n"+(err?.message||String(err));
+        statusEl.textContent = "";
+        errorEl.textContent = "Fout:\n" + (err?.message || String(err));
       }
     }
 
+    // ---------- likes ----------
+    async function toggleLike(storyId, btnEl) {
+      const countEl = document.getElementById(`like-count-${storyId}`);
+      const wasLiked = btnEl.classList.contains("active");
+
+      // Optimistic UI
+      btnEl.classList.toggle("active");
+      const current = parseInt(countEl.textContent || "0", 10);
+      countEl.textContent = String(Math.max(0, current + (wasLiked ? -1 : 1)));
+
+      try {
+        if (wasLiked) {
+          // delete like
+          const { error } = await window.supabaseClient
+            .from("likes")
+            .delete()
+            .eq("story_id", storyId)
+            .eq("visitor_id", VISITOR_ID);
+
+          if (error) throw error;
+        } else {
+          // insert like (unique constraint voorkomt dubbel)
+          const { error } = await window.supabaseClient
+            .from("likes")
+            .insert({ story_id: storyId, visitor_id: VISITOR_ID });
+
+          if (error) throw error;
+        }
+      } catch (err) {
+        console.error(err);
+        // Revert UI if error
+        btnEl.classList.toggle("active");
+        countEl.textContent = String(current);
+        alert("Like lukt niet: " + (err?.message || String(err)));
+      }
+    }
+
+    // ---------- comments ----------
     async function loadCommentCount(storyId){
       try{
         const { count, error } = await window.supabaseClient
           .from("comments")
           .select("id", { count: "exact", head: true })
           .eq("story_id", storyId);
-        if(error) throw error;
-        const el=document.getElementById(`count-${storyId}`);
-        if(el) el.textContent=`${count ?? 0} reactie(s)`;
-      }catch{}
+
+        if (error) throw error;
+
+        const el = document.getElementById(`comment-count-${storyId}`);
+        if (el) el.textContent = `${count ?? 0} reactie(s)`;
+      } catch {}
     }
 
     async function loadComments(storyId){
-      const statusEl=document.getElementById(`cstatus-${storyId}`);
-      const listEl=document.getElementById(`clist-${storyId}`);
-      statusEl.textContent="Reacties laden..."; listEl.innerHTML="";
+      const statusEl = document.getElementById(`cstatus-${storyId}`);
+      const listEl = document.getElementById(`clist-${storyId}`);
+
+      statusEl.textContent = "Reacties laden...";
+      listEl.innerHTML = "";
 
       try{
         const { data, error } = await window.supabaseClient
           .from("comments")
           .select("id,author_name,content,created_at")
           .eq("story_id", storyId)
-          .order("created_at",{ascending:true});
-        if(error) throw error;
+          .order("created_at", { ascending: true });
 
-        if(!data || data.length===0){
-          statusEl.textContent="Nog geen reacties. Wees de eerste!";
+        if (error) throw error;
+
+        if (!data || data.length === 0){
+          statusEl.textContent = "Nog geen reacties. Wees de eerste!";
           return;
         }
 
-        statusEl.textContent="";
-        data.forEach(c=>{
-          const div=document.createElement("div");
-          div.className="comment";
-          div.innerHTML=`
+        statusEl.textContent = "";
+        data.forEach(c => {
+          const div = document.createElement("div");
+          div.className = "comment";
+          div.innerHTML = `
             <div class="meta">
-              ${c.author_name ? `<span class="pill">👤 ${escapeHtml(c.author_name)}</span>` : ""}
               <span class="pill">🗓️ ${fmtDate(c.created_at)}</span>
+              ${c.author_name ? `<span class="pill">👤 ${escapeHtml(c.author_name)}</span>` : `<span class="pill">👤 Anoniem</span>`}
             </div>
             <p>${escapeHtml(c.content)}</p>
           `;
           listEl.appendChild(div);
         });
 
-      }catch(err){
+      } catch(err){
         console.error(err);
-        statusEl.textContent="Fout bij laden reacties: "+(err?.message||String(err));
+        statusEl.textContent = "Fout bij laden reacties: " + (err?.message || String(err));
       }
     }
 
     async function submitComment(form, storyId){
-      const msgEl=document.getElementById(`cmsg-${storyId}`);
-      msgEl.textContent="Plaatsen...";
-      const author=(form.elements.author.value||"").trim();
-      const content=(form.elements.content.value||"").trim();
+      const msgEl = document.getElementById(`cmsg-${storyId}`);
+      msgEl.textContent = "Plaatsen...";
+
+      const author = (form.elements.author.value || "").trim();
+      const content = (form.elements.content.value || "").trim();
 
       try{
         const { error } = await window.supabaseClient
           .from("comments")
-          .insert({ story_id: storyId, author_name: author||null, content });
-        if(error) throw error;
+          .insert({
+            story_id: storyId,
+            author_name: author || null,
+            content
+          });
+
+        if (error) throw error;
 
         form.reset();
-        msgEl.textContent="✅ Geplaatst!";
-        setTimeout(()=>msgEl.textContent="",1200);
+        msgEl.textContent = "✅ Geplaatst!";
+        setTimeout(() => (msgEl.textContent = ""), 1200);
 
         await loadComments(storyId);
         await loadCommentCount(storyId);
 
-      }catch(err){
+      } catch(err){
         console.error(err);
-        msgEl.textContent="❌ "+(err?.message||String(err));
+        msgEl.textContent = "❌ " + (err?.message || String(err));
       }
     }
 
