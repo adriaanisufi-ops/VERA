@@ -15,7 +15,6 @@
       --bg:#0b1020;
       --bg2:#0f1732;
       --card: rgba(255,255,255,.06);
-      --card2: rgba(255,255,255,.08);
       --text:#eef2ff;
       --muted: rgba(238,242,255,.70);
       --border: rgba(255,255,255,.12);
@@ -55,6 +54,43 @@
       border-radius: var(--radius);
       box-shadow: var(--shadow);
       backdrop-filter: blur(10px);
+    }
+
+    .brand-wrap{
+      display:flex;
+      align-items:center;
+      gap:12px;
+      min-width:0;
+    }
+
+    .logo{
+      width:40px;
+      height:40px;
+      border-radius:50%;
+      display:flex;
+      align-items:center;
+      justify-content:center;
+      background: radial-gradient(circle at 30% 30%, rgba(139,92,246,.35), rgba(34,211,238,.15));
+      box-shadow:
+        0 0 20px rgba(139,92,246,.35),
+        0 0 40px rgba(34,211,238,.15);
+      flex: 0 0 auto;
+    }
+
+    .logo svg{
+      border-radius:50%;
+      animation: spin 18s linear infinite;
+    }
+
+    @keyframes spin{
+      from{ transform: rotate(0deg); }
+      to{ transform: rotate(360deg); }
+    }
+
+    @media (prefers-reduced-motion: reduce){
+      .logo svg{ animation: none; }
+      .story{ animation: none !important; opacity: 1 !important; transform:none !important; }
+      .btn, .like{ transition:none !important; }
     }
 
     .brand{
@@ -119,7 +155,7 @@
     /* Cards */
     .story{
       margin-top: 14px;
-      background: linear-gradient(180deg, var(--card), rgba(255,255,255,.05));
+      background: linear-gradient(180deg, rgba(255,255,255,.06), rgba(255,255,255,.05));
       border: 1px solid var(--border);
       border-radius: var(--radius);
       box-shadow: var(--shadow);
@@ -159,7 +195,6 @@
       font-size: 12px;
       color: var(--muted);
     }
-
     .tag{
       border-color: rgba(34,211,238,.28);
       background: rgba(34,211,238,.10);
@@ -252,16 +287,9 @@
     /* Mobile polish */
     @media (max-width: 520px){
       .container{ margin: 18px auto; }
-      .topbar{ padding: 12px; }
-      .brand h1{ font-size: 18px; }
       .btn{ width: 100%; }
       .topbar{ flex-direction: column; align-items: stretch; }
       .story-head, .story-body, .story-actions, .comments{ padding-left: 12px; padding-right: 12px; }
-    }
-
-    @media (prefers-reduced-motion: reduce){
-      .story{ animation: none; opacity:1; transform:none; }
-      .btn, .like{ transition:none; }
     }
   </style>
 </head>
@@ -269,10 +297,25 @@
 <body>
   <div class="container">
     <div class="topbar">
-      <div class="brand">
-        <h1>Verhalen</h1>
-        <p>Lees, deel, like en reageer — met respect.</p>
+      <div class="brand-wrap">
+        <div class="logo" title="Yin & Yang">
+          <svg viewBox="0 0 100 100" width="36" height="36" aria-hidden="true">
+            <circle cx="50" cy="50" r="48" fill="white"/>
+            <path d="M50 2
+                     a48 48 0 1 0 0 96
+                     a24 24 0 1 1 0-48
+                     a24 24 0 1 0 0-48" fill="black"/>
+            <circle cx="50" cy="26" r="6" fill="white"/>
+            <circle cx="50" cy="74" r="6" fill="black"/>
+          </svg>
+        </div>
+
+        <div class="brand">
+          <h1>Verhalen</h1>
+          <p>Lees, deel, like en reageer — met respect.</p>
+        </div>
       </div>
+
       <a class="btn btn-primary" href="deel.html">Deel jouw verhaal</a>
     </div>
 
@@ -309,7 +352,6 @@
     function normalizeTags(tags){
       if (!tags) return [];
       if (Array.isArray(tags)) return tags.filter(Boolean).map(t => String(t).trim()).filter(Boolean);
-      // fallback if it ever comes as string
       return String(tags).split(",").map(t => t.trim()).filter(Boolean);
     }
 
@@ -326,7 +368,7 @@
       try {
         if (!window.supabaseClient) throw new Error("Supabase client niet geladen. Controleer supabase.js.");
 
-        // 1) haal stories
+        // 1) stories
         const { data: stories, error: sErr } = await window.supabaseClient
           .from("stories")
           .select("id,title,author_name,created_at,content,category,tags")
@@ -342,7 +384,7 @@
 
         statusEl.textContent = "";
 
-        // 2) haal alle likes (count + welke stories geliked door visitor)
+        // 2) likes for these stories
         const storyIds = stories.map(s => s.id);
 
         const { data: allLikes, error: lErr } = await window.supabaseClient
@@ -352,8 +394,8 @@
 
         if (lErr) throw lErr;
 
-        const likeCounts = new Map();     // story_id -> count
-        const likedByMe = new Set();      // story_id set
+        const likeCounts = new Map();
+        const likedByMe = new Set();
 
         (allLikes || []).forEach(l => {
           likeCounts.set(l.story_id, (likeCounts.get(l.story_id) || 0) + 1);
@@ -378,7 +420,7 @@
                 <span class="pill">🗓️ ${fmtDate(s.created_at)}</span>
                 ${s.author_name ? `<span class="pill">👤 ${escapeHtml(s.author_name)}</span>` : `<span class="pill">👤 Anoniem</span>`}
                 <span class="pill cat">🏷️ ${escapeHtml(category)}</span>
-                ${tags.slice(0, 8).map(t => `<span class="pill tag">#${escapeHtml(t)}</span>`).join("")}
+                ${tags.slice(0, 10).map(t => `<span class="pill tag">#${escapeHtml(t)}</span>`).join("")}
               </div>
             </div>
 
@@ -397,8 +439,7 @@
 
                 <span class="small" id="comment-count-${s.id}"></span>
               </div>
-
-              <span class="small"> </span>
+              <span class="small"></span>
             </div>
 
             <div class="comments" id="comments-${s.id}">
@@ -469,25 +510,21 @@
 
       try {
         if (wasLiked) {
-          // delete like
           const { error } = await window.supabaseClient
             .from("likes")
             .delete()
             .eq("story_id", storyId)
             .eq("visitor_id", VISITOR_ID);
-
           if (error) throw error;
         } else {
-          // insert like (unique constraint voorkomt dubbel)
           const { error } = await window.supabaseClient
             .from("likes")
             .insert({ story_id: storyId, visitor_id: VISITOR_ID });
-
           if (error) throw error;
         }
       } catch (err) {
         console.error(err);
-        // Revert UI if error
+        // Revert UI
         btnEl.classList.toggle("active");
         countEl.textContent = String(current);
         alert("Like lukt niet: " + (err?.message || String(err)));
