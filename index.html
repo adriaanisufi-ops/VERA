@@ -4,45 +4,230 @@
   <meta charset="utf-8" />
   <meta name="viewport" content="width=device-width, initial-scale=1" />
   <title>Verhalen</title>
+
+  <!-- Font -->
+  <link rel="preconnect" href="https://fonts.googleapis.com">
+  <link rel="preconnect" href="https://fonts.gstatic.com" crossorigin>
+  <link href="https://fonts.googleapis.com/css2?family=Inter:wght@400;500;600;700&display=swap" rel="stylesheet">
+
   <style>
     :root{
-      --bg:#f6f7fb; --card:#fff; --text:#111827; --muted:#6b7280; --border:#e5e7eb;
-      --accent:#6d28d9; --accent2:#7c3aed; --shadow:0 10px 30px rgba(0,0,0,.08);
-      --radius:18px; --danger:#dc2626;
+      --bg: #0b1020;
+      --bg2:#0f1732;
+      --card: rgba(255,255,255,.06);
+      --card2: rgba(255,255,255,.08);
+      --text: #eef2ff;
+      --muted: rgba(238,242,255,.70);
+      --border: rgba(255,255,255,.12);
+      --accent:#8b5cf6;
+      --accent2:#22d3ee;
+      --danger:#fb7185;
+      --shadow: 0 18px 60px rgba(0,0,0,.35);
+      --radius: 18px;
     }
-    *{box-sizing:border-box}
-    body{margin:0;font-family:system-ui,-apple-system,Segoe UI,Roboto,Arial;background:var(--bg);color:var(--text)}
-    .container{max-width:980px;margin:36px auto;padding:0 16px 60px}
-    .topbar{display:flex;justify-content:space-between;align-items:center;gap:12px;padding:14px 16px;
-      background:rgba(255,255,255,.65);border:1px solid var(--border);border-radius:var(--radius);backdrop-filter:blur(8px)}
-    .brand h1{margin:0;font-size:22px;letter-spacing:-.02em}
-    .brand p{margin:2px 0 0;color:var(--muted);font-size:13px}
-    .btn{display:inline-flex;align-items:center;justify-content:center;gap:8px;padding:10px 14px;border-radius:14px;
-      border:1px solid var(--border);background:var(--card);color:var(--text);text-decoration:none;cursor:pointer}
-    .btn-primary{border-color:rgba(109,40,217,.25);background:linear-gradient(135deg,var(--accent),var(--accent2));color:#fff}
-    .status{margin:14px 4px 0;color:var(--muted);font-size:14px}
-    .error{margin:10px 4px 0;color:var(--danger);white-space:pre-wrap;font-size:14px}
 
-    .story{margin-top:16px;background:var(--card);border:1px solid var(--border);border-radius:var(--radius);box-shadow:var(--shadow);overflow:hidden}
-    .story-head{padding:18px 18px 10px}
-    .story h2{margin:0;font-size:18px;letter-spacing:-.02em}
-    .meta{margin-top:6px;color:var(--muted);font-size:13px}
-    .story-body{padding:0 18px 16px;line-height:1.65;white-space:pre-wrap}
+    *{ box-sizing:border-box; }
+    html,body{ height:100%; }
+    body{
+      margin:0;
+      font-family: Inter, system-ui, -apple-system, Segoe UI, Roboto, Arial;
+      color: var(--text);
+      background:
+        radial-gradient(1200px 600px at 15% 10%, rgba(139,92,246,.30), transparent 55%),
+        radial-gradient(900px 500px at 85% 20%, rgba(34,211,238,.22), transparent 55%),
+        linear-gradient(180deg, var(--bg), var(--bg2));
+    }
 
-    .story-actions{display:flex;gap:10px;align-items:center;justify-content:space-between;padding:14px 18px;
-      border-top:1px solid var(--border);background:#fafafa}
-    .small{font-size:13px;color:var(--muted)}
+    .container{
+      max-width: 980px;
+      margin: 26px auto;
+      padding: 0 14px 60px;
+    }
 
-    .comments{display:none;padding:14px 18px 18px;border-top:1px solid var(--border);background:#fff}
-    .comments.open{display:block}
-    .comment{border:1px solid var(--border);border-radius:14px;padding:12px;margin-top:10px;background:#fff}
-    .comment p{margin:8px 0 0;white-space:pre-wrap;line-height:1.5}
+    .topbar{
+      display:flex;
+      justify-content:space-between;
+      align-items:center;
+      gap:12px;
+      padding: 14px 14px;
+      background: rgba(255,255,255,.06);
+      border: 1px solid var(--border);
+      border-radius: var(--radius);
+      box-shadow: var(--shadow);
+      backdrop-filter: blur(10px);
+    }
 
-    .form{margin-top:12px;display:grid;gap:10px}
-    input,textarea{width:100%;padding:12px;border-radius:14px;border:1px solid var(--border);font:inherit;background:#fff}
-    textarea{min-height:110px;resize:vertical}
-    .row{display:flex;gap:10px;align-items:center;justify-content:flex-end}
-    .hint{color:var(--muted);font-size:13px}
+    .brand{
+      display:flex; flex-direction:column; gap:4px;
+      min-width: 0;
+    }
+    .brand h1{
+      margin:0;
+      font-size: 20px;
+      letter-spacing: -0.03em;
+      line-height: 1.1;
+    }
+    .brand p{
+      margin:0;
+      color: var(--muted);
+      font-size: 13px;
+      white-space: nowrap;
+      overflow: hidden;
+      text-overflow: ellipsis;
+    }
+
+    .btn{
+      appearance:none;
+      border:1px solid var(--border);
+      background: rgba(255,255,255,.06);
+      color: var(--text);
+      padding: 10px 12px;
+      border-radius: 14px;
+      cursor:pointer;
+      font: inherit;
+      text-decoration:none;
+      display:inline-flex;
+      align-items:center;
+      justify-content:center;
+      gap:10px;
+      transition: transform .12s ease, background .12s ease, border-color .12s ease, opacity .12s ease;
+      user-select:none;
+      white-space: nowrap;
+    }
+    .btn:hover{ transform: translateY(-1px); background: rgba(255,255,255,.09); }
+    .btn:active{ transform: translateY(0px); opacity:.92; }
+
+    .btn-primary{
+      border-color: rgba(139,92,246,.35);
+      background: linear-gradient(135deg, rgba(139,92,246,.85), rgba(34,211,238,.70));
+      box-shadow: 0 10px 24px rgba(139,92,246,.18);
+    }
+    .btn-primary:hover{ background: linear-gradient(135deg, rgba(139,92,246,.95), rgba(34,211,238,.80)); }
+
+    .status{
+      margin: 14px 4px 0;
+      color: var(--muted);
+      font-size: 14px;
+    }
+    .error{
+      margin: 10px 4px 0;
+      color: var(--danger);
+      white-space: pre-wrap;
+      font-size: 14px;
+    }
+
+    /* Cards */
+    .story{
+      margin-top: 14px;
+      background: linear-gradient(180deg, var(--card), rgba(255,255,255,.05));
+      border: 1px solid var(--border);
+      border-radius: var(--radius);
+      box-shadow: var(--shadow);
+      overflow:hidden;
+      transform: translateY(10px);
+      opacity: 0;
+      animation: fadeUp .35s ease forwards;
+    }
+    @keyframes fadeUp{
+      to{ transform: translateY(0); opacity:1; }
+    }
+
+    .story-head{ padding: 16px 16px 8px; }
+    .story h2{
+      margin:0;
+      font-size: 17px;
+      letter-spacing: -0.02em;
+      line-height: 1.25;
+    }
+    .meta{
+      margin-top: 8px;
+      color: var(--muted);
+      font-size: 13px;
+      display:flex;
+      gap:10px;
+      flex-wrap: wrap;
+      align-items:center;
+    }
+    .pill{
+      display:inline-flex;
+      align-items:center;
+      gap:6px;
+      padding: 4px 10px;
+      border-radius: 999px;
+      border: 1px solid var(--border);
+      background: rgba(255,255,255,.06);
+      font-size: 12px;
+      color: var(--muted);
+    }
+
+    .story-body{
+      padding: 0 16px 14px;
+      line-height: 1.75;
+      white-space: pre-wrap;
+      color: rgba(238,242,255,.92);
+    }
+
+    .story-actions{
+      display:flex;
+      gap:10px;
+      align-items:center;
+      justify-content:space-between;
+      padding: 12px 16px;
+      border-top: 1px solid var(--border);
+      background: rgba(255,255,255,.04);
+    }
+    .small{ font-size: 13px; color: var(--muted); }
+
+    /* Comments */
+    .comments{
+      display:none;
+      padding: 12px 16px 16px;
+      border-top: 1px solid var(--border);
+      background: rgba(255,255,255,.03);
+    }
+    .comments.open{ display:block; }
+
+    .comment{
+      border: 1px solid var(--border);
+      border-radius: 14px;
+      padding: 12px;
+      margin-top: 10px;
+      background: rgba(255,255,255,.06);
+    }
+    .comment p{ margin: 8px 0 0; white-space: pre-wrap; line-height: 1.55; color: rgba(238,242,255,.92); }
+
+    .form{ margin-top: 12px; display:grid; gap:10px; }
+    input, textarea{
+      width:100%;
+      padding: 12px;
+      border-radius: 14px;
+      border: 1px solid var(--border);
+      background: rgba(255,255,255,.06);
+      color: var(--text);
+      font: inherit;
+      outline: none;
+    }
+    input::placeholder, textarea::placeholder{ color: rgba(238,242,255,.55); }
+    textarea{ min-height: 110px; resize: vertical; }
+
+    .row{ display:flex; gap:10px; align-items:center; justify-content:flex-end; flex-wrap: wrap; }
+    .hint{ color: var(--muted); font-size: 13px; }
+
+    /* Mobile polish */
+    @media (max-width: 520px){
+      .container{ margin: 18px auto; }
+      .topbar{ padding: 12px; }
+      .brand h1{ font-size: 18px; }
+      .btn{ width: 100%; }
+      .topbar{ flex-direction: column; align-items: stretch; }
+      .story-head, .story-body, .story-actions, .comments{ padding-left: 12px; padding-right: 12px; }
+    }
+
+    /* Reduced motion */
+    @media (prefers-reduced-motion: reduce){
+      .story{ animation: none; opacity:1; transform:none; }
+      .btn{ transition:none; }
+    }
   </style>
 </head>
 <body>
@@ -91,18 +276,23 @@
 
         statusEl.textContent="";
 
-        data.forEach((s)=>{
+        data.forEach((s, i)=>{
           const el=document.createElement("section");
           el.className="story";
+          el.style.animationDelay = (i * 30) + "ms";
           el.innerHTML=`
             <div class="story-head">
               <h2>${escapeHtml(s.title)}</h2>
-              <div class="meta">${s.author_name ? "Door "+escapeHtml(s.author_name)+" · " : ""}${fmtDate(s.created_at)}</div>
+              <div class="meta">
+                <span class="pill">🗓️ ${fmtDate(s.created_at)}</span>
+                ${s.author_name ? `<span class="pill">👤 ${escapeHtml(s.author_name)}</span>` : ""}
+              </div>
             </div>
+
             <div class="story-body">${escapeHtml(s.content)}</div>
 
             <div class="story-actions">
-              <button class="btn" data-action="toggle-comments" data-story="${s.id}">Reacties bekijken</button>
+              <button class="btn" data-action="toggle-comments" data-story="${s.id}">💬 Reacties</button>
               <span class="small" id="count-${s.id}"></span>
             </div>
 
@@ -129,7 +319,7 @@
           const storyId=btn.getAttribute("data-story");
           const panel=document.getElementById(`comments-${storyId}`);
           const isOpen=panel.classList.toggle("open");
-          btn.textContent=isOpen ? "Reacties verbergen" : "Reacties bekijken";
+          btn.textContent = isOpen ? "🙈 Verbergen" : "💬 Reacties";
           if(isOpen) await loadComments(storyId);
         });
 
@@ -185,7 +375,10 @@
           const div=document.createElement("div");
           div.className="comment";
           div.innerHTML=`
-            <div class="meta">${c.author_name ? "Door "+escapeHtml(c.author_name)+" · " : ""}${fmtDate(c.created_at)}</div>
+            <div class="meta">
+              ${c.author_name ? `<span class="pill">👤 ${escapeHtml(c.author_name)}</span>` : ""}
+              <span class="pill">🗓️ ${fmtDate(c.created_at)}</span>
+            </div>
             <p>${escapeHtml(c.content)}</p>
           `;
           listEl.appendChild(div);
