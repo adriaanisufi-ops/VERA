@@ -61,7 +61,7 @@
       });
       if (error) return msg.textContent = "❌ " + error.message;
       msg.textContent = "✅ Ingelogd!";
-      setTimeout(()=>location.href="profile.html", 600);
+     setTimeout(()=>location.href="index.html?ts=" + Date.now(), 200);
     };
   </script>
 </body>
