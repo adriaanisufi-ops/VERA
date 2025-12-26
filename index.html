@@ -19,6 +19,7 @@
       --accent:#8b5cf6;
       --accent2:#22d3ee;
       --danger:#fb7185;
+      --ok:#34d399;
       --radius:18px;
       --shadow: 0 18px 60px rgba(0,0,0,.35);
     }
@@ -43,34 +44,46 @@
       box-shadow: var(--shadow);
       backdrop-filter: blur(10px);
     }
-    .brand-wrap{display:flex;align-items:center;gap:12px}
+    .brand-wrap{display:flex;align-items:center;gap:12px;min-width:0}
     .logo{
       width:38px;height:38px;border-radius:999px;
       display:grid;place-items:center;
       background:rgba(255,255,255,.08);
       border:1px solid rgba(255,255,255,.14);
+      flex:0 0 auto;
     }
+    .brand{min-width:0}
     .brand h1{margin:0;font-size:18px;line-height:1.1}
-    .brand p{margin:3px 0 0;color:var(--muted);font-size:13px}
+    .brand p{margin:3px 0 0;color:var(--muted);font-size:13px;white-space:nowrap;overflow:hidden;text-overflow:ellipsis}
     .actions{display:flex; gap:10px; align-items:center; flex-wrap:wrap; justify-content:flex-end}
+
     .btn{
       display:inline-flex; align-items:center; gap:8px;
       padding:10px 14px; border-radius:999px;
       border:1px solid var(--border);
       background:rgba(255,255,255,.06);
       color:var(--text); text-decoration:none;
-      font-weight:600; font-size:14px;
+      font-weight:700; font-size:14px;
       cursor:pointer;
+      user-select:none;
     }
     .btn:hover{background:rgba(255,255,255,.09)}
+    .btn:active{opacity:.92}
+    .btn[disabled]{opacity:.55; cursor:not-allowed}
     .btn-primary{
       border:1px solid rgba(139,92,246,.35);
       background: linear-gradient(135deg, rgba(139,92,246,.95), rgba(34,211,238,.75));
       box-shadow: 0 14px 40px rgba(139,92,246,.20);
     }
+    .btn-danger{
+      border:1px solid rgba(251,113,133,.35);
+      background: rgba(251,113,133,.14);
+    }
 
     .status{margin:14px 6px 0;color:var(--muted);font-size:14px}
     .error{margin:10px 6px 0;color:var(--danger);font-weight:700;white-space:pre-wrap}
+    .ok{margin:10px 6px 0;color:var(--ok);font-weight:700;white-space:pre-wrap}
+
     .grid{margin-top:16px;display:grid;gap:14px}
     .card{
       background:var(--card);
@@ -91,13 +104,42 @@
       background:rgba(255,255,255,.06);
     }
     .divider{height:1px;background:rgba(255,255,255,.10);margin:12px 0}
-    .mini{display:flex;gap:10px;flex-wrap:wrap;color:var(--muted);font-size:13px}
+    .mini{display:flex;gap:10px;flex-wrap:wrap;color:var(--muted);font-size:13px;align-items:center}
+    .row-actions{display:flex;gap:10px;flex-wrap:wrap;justify-content:flex-end;margin-top:10px}
+
+    .comments{
+      margin-top:10px;
+      border:1px solid rgba(255,255,255,.12);
+      border-radius:14px;
+      padding:10px;
+      background:rgba(0,0,0,.18);
+      display:none;
+    }
+    .comments.open{display:block}
+    .comment{
+      padding:10px 10px;
+      border-radius:12px;
+      border:1px solid rgba(255,255,255,.10);
+      background:rgba(255,255,255,.05);
+      margin-top:8px;
+    }
+    .comment .cmeta{color:var(--muted);font-size:12px;display:flex;gap:8px;flex-wrap:wrap}
+    .comment .ctext{margin-top:6px;white-space:pre-wrap;line-height:1.5}
+    .cform{display:flex;gap:8px;margin-top:10px}
+    .cform input{
+      flex:1;
+      padding:10px 12px;
+      border-radius:12px;
+      border:1px solid rgba(255,255,255,.12);
+      background:rgba(255,255,255,.06);
+      color:var(--text);
+      font:inherit;
+    }
   </style>
 </head>
 
 <body>
   <div class="container">
-
     <div class="topbar">
       <div class="brand-wrap">
         <div class="logo" title="Yin & Yang">
@@ -124,17 +166,20 @@
 
     <div id="status" class="status">Verhalen laden…</div>
     <div id="error" class="error"></div>
+    <div id="ok" class="ok"></div>
     <div id="stories" class="grid"></div>
   </div>
 
-  <!-- Supabase -->
   <script src="https://cdn.jsdelivr.net/npm/@supabase/supabase-js@2"></script>
   <script src="supabase.js"></script>
 
   <script>
     const statusEl = document.getElementById("status");
     const errorEl  = document.getElementById("error");
+    const okEl     = document.getElementById("ok");
     const wrapEl   = document.getElementById("stories");
+
+    let CURRENT_USER = null; // { id, email }
 
     function escapeHtml(str){
       return (str ?? "").replace(/[&<>"']/g, (m) => ({
@@ -148,90 +193,248 @@
       }catch(e){ return ""; }
     }
 
-    async function updateAuthButton() {
+    async function refreshUser(){
+      CURRENT_USER = null;
+      const { data: { user } } = await window.supabaseClient.auth.getUser();
+      if (user) CURRENT_USER = { id: user.id, email: user.email };
+    }
+
+    async function updateAuthButton(){
       const authBtn = document.getElementById("authBtn");
       if (!authBtn) return;
-
-      if (!window.supabaseClient) {
-        // als client niet geladen is, laat knop gewoon naar login gaan
+      if (!CURRENT_USER){
         authBtn.textContent = "Inloggen";
         authBtn.href = "./login.html";
-        return;
-      }
-
-      const { data: { user }, error } = await window.supabaseClient.auth.getUser();
-      if (error) {
-        authBtn.textContent = "Inloggen";
-        authBtn.href = "./login.html";
-        return;
-      }
-
-      if (user) {
+      } else {
         authBtn.textContent = "Profiel";
         authBtn.href = "./profile.html";
-      } else {
-        authBtn.textContent = "Inloggen";
-        authBtn.href = "./login.html";
       }
     }
 
-    async function safeCount(table, storyId){
-      try{
-        const { count, error } = await window.supabaseClient
-          .from(table)
-          .select("*", { count:"exact", head:true })
-          .eq("story_id", storyId);
+    async function countRows(table, storyId){
+      const { count, error } = await window.supabaseClient
+        .from(table)
+        .select("*", { count:"exact", head:true })
+        .eq("story_id", storyId);
+      if (error) return null;
+      return count ?? 0;
+    }
 
-        if (error) return null;
-        return count ?? 0;
-      } catch {
-        return null;
+    async function didILike(storyId){
+      if (!CURRENT_USER) return false;
+      const { data, error } = await window.supabaseClient
+        .from("likes")
+        .select("id")
+        .eq("story_id", storyId)
+        .eq("user_id", CURRENT_USER.id)
+        .maybeSingle();
+      if (error) return false;
+      return !!data;
+    }
+
+    async function renderMini(storyId){
+      const mini = document.getElementById(`mini-${storyId}`);
+      if (!mini) return;
+
+      const [likesCount, commentsCount, liked] = await Promise.all([
+        countRows("likes", storyId),
+        countRows("comments", storyId),
+        didILike(storyId)
+      ]);
+
+      mini.innerHTML = `
+        <span>❤️ Likes: ${likesCount ?? "?"}</span>
+        <span>💬 Reacties: ${commentsCount ?? "?"}</span>
+        ${CURRENT_USER ? `<span>${liked ? "✅ Jij hebt geliked" : ""}</span>` : `<span style="opacity:.7">(log in om te liken)</span>`}
+      `;
+    }
+
+    async function loadComments(storyId){
+      const listEl = document.getElementById(`commentlist-${storyId}`);
+      if (!listEl) return;
+
+      listEl.innerHTML = `<div style="color:rgba(238,242,255,.7);font-size:13px">Reacties laden…</div>`;
+
+      const { data, error } = await window.supabaseClient
+        .from("comments")
+        .select("id,author_name,content,created_at")
+        .eq("story_id", storyId)
+        .order("created_at", { ascending:true })
+        .limit(50);
+
+      if (error){
+        listEl.innerHTML = `<div style="color:#fb7185;font-weight:700;font-size:13px">❌ ${escapeHtml(error.message)}</div>`;
+        return;
       }
+
+      if (!data || data.length === 0){
+        listEl.innerHTML = `<div style="color:rgba(238,242,255,.7);font-size:13px">Nog geen reacties.</div>`;
+        return;
+      }
+
+      listEl.innerHTML = data.map(c => `
+        <div class="comment">
+          <div class="cmeta">
+            <span><b>${escapeHtml(c.author_name || "Anoniem")}</b></span>
+            <span>•</span>
+            <span>${escapeHtml(formatDate(c.created_at))}</span>
+          </div>
+          <div class="ctext">${escapeHtml(c.content)}</div>
+        </div>
+      `).join("");
+    }
+
+    async function toggleLike(storyId, btn){
+      okEl.textContent = "";
+      errorEl.textContent = "";
+
+      if (!CURRENT_USER){
+        errorEl.textContent = "❌ Log in om te liken.";
+        return;
+      }
+
+      btn.disabled = true;
+
+      const liked = await didILike(storyId);
+
+      if (!liked){
+        const { error } = await window.supabaseClient
+          .from("likes")
+          .insert({ story_id: storyId, user_id: CURRENT_USER.id });
+
+        if (error){
+          // unique constraint -> al geliked (race), dan gewoon refresh
+          errorEl.textContent = "❌ " + error.message;
+          btn.disabled = false;
+          await renderMini(storyId);
+          return;
+        }
+
+        okEl.textContent = "✅ Geliked!";
+      } else {
+        const { error } = await window.supabaseClient
+          .from("likes")
+          .delete()
+          .eq("story_id", storyId)
+          .eq("user_id", CURRENT_USER.id);
+
+        if (error){
+          errorEl.textContent = "❌ " + error.message;
+          btn.disabled = false;
+          await renderMini(storyId);
+          return;
+        }
+
+        okEl.textContent = "✅ Like verwijderd!";
+      }
+
+      btn.disabled = false;
+      await renderMini(storyId);
+    }
+
+    async function addComment(storyId, inputEl, btn){
+      okEl.textContent = "";
+      errorEl.textContent = "";
+
+      if (!CURRENT_USER){
+        errorEl.textContent = "❌ Log in om te reageren.";
+        return;
+      }
+
+      const text = (inputEl.value || "").trim();
+      if (!text){
+        errorEl.textContent = "❌ Typ eerst een reactie.";
+        return;
+      }
+
+      btn.disabled = true;
+
+      // naam: als je later profiles koppelt kun je hier username zetten
+      const authorName = "Ingelogd";
+
+      const { error } = await window.supabaseClient
+        .from("comments")
+        .insert({
+          story_id: storyId,
+          user_id: CURRENT_USER.id,
+          author_name: authorName,
+          content: text
+        });
+
+      if (error){
+        errorEl.textContent = "❌ " + error.message;
+        btn.disabled = false;
+        return;
+      }
+
+      inputEl.value = "";
+      okEl.textContent = "✅ Reactie geplaatst!";
+      btn.disabled = false;
+
+      await loadComments(storyId);
+      await renderMini(storyId);
+    }
+
+    async function deleteStory(storyId){
+      okEl.textContent = "";
+      errorEl.textContent = "";
+
+      if (!CURRENT_USER){
+        errorEl.textContent = "❌ Log in om te verwijderen.";
+        return;
+      }
+
+      const ok = confirm("Weet je zeker dat je jouw verhaal wilt verwijderen?");
+      if (!ok) return;
+
+      const { error } = await window.supabaseClient
+        .from("stories")
+        .delete()
+        .eq("id", storyId);
+
+      if (error){
+        errorEl.textContent = "❌ " + error.message;
+        return;
+      }
+
+      okEl.textContent = "✅ Verhaal verwijderd.";
+      await loadStories();
     }
 
     async function loadStories(){
+      okEl.textContent = "";
       errorEl.textContent = "";
       statusEl.textContent = "Verhalen laden…";
+      wrapEl.innerHTML = "";
 
       try{
-        if (!window.supabaseClient) {
-          throw new Error("Supabase client niet geladen. Controleer supabase.js en of de URL/key kloppen.");
-        }
+        if (!window.supabaseClient) throw new Error("Supabase client niet geladen (supabase.js).");
 
-        // Debug: laat zien of je ingelogd bent
-        const { data: uData } = await window.supabaseClient.auth.getUser();
-        const userEmail = uData?.user?.email || "(niet ingelogd)";
+        await refreshUser();
+        await updateAuthButton();
 
         const { data, error } = await window.supabaseClient
           .from("stories")
-         .select("id,user_id,title,content,author_name,created_at,category,tags")
+          .select("id,user_id,title,content,author_name,created_at,category,tags")
           .order("created_at", { ascending:false })
           .limit(50);
 
-        if (error) {
-          throw new Error(
-            "Stories query faalde.\n" +
-            "User: " + userEmail + "\n" +
-            "Error: " + error.message +
-            (error.details ? ("\nDetails: " + error.details) : "") +
-            (error.hint ? ("\nHint: " + error.hint) : "")
-          );
-        }
+        if (error) throw new Error(error.message);
 
         if (!data || data.length === 0){
-          wrapEl.innerHTML = "";
           statusEl.textContent = "Nog geen verhalen. Klik op ‘Deel jouw verhaal’ om de eerste te plaatsen.";
           return;
         }
 
         statusEl.textContent = "";
-        wrapEl.innerHTML = "";
 
         for (const s of data){
           const tags = Array.isArray(s.tags) ? s.tags : [];
           const tagsHtml = tags.length
             ? `<div class="tags">${tags.map(t => `<span class="tag">#${escapeHtml(t)}</span>`).join("")}</div>`
             : "";
+
+          const canDelete = CURRENT_USER && s.user_id && (s.user_id === CURRENT_USER.id);
 
           const card = document.createElement("div");
           card.className = "card";
@@ -249,54 +452,83 @@
             ${tagsHtml}
 
             <div class="divider"></div>
+
             <div class="mini" id="mini-${s.id}">
               <span>❤️ Likes: …</span>
               <span>💬 Reacties: …</span>
+            </div>
+
+            <div class="row-actions">
+              <button class="btn" data-action="like" data-id="${s.id}">❤️ Like</button>
+              <button class="btn" data-action="toggle-comments" data-id="${s.id}">💬 Reacties</button>
+              ${canDelete ? `<button class="btn btn-danger" data-action="delete" data-id="${s.id}">🗑️ Verwijderen</button>` : ``}
+            </div>
+
+            <div class="comments" id="comments-${s.id}">
+              <div id="commentlist-${s.id}"></div>
+              <div class="cform">
+                <input id="commentinput-${s.id}" placeholder="Schrijf een reactie…" />
+                <button class="btn" data-action="send-comment" data-id="${s.id}">Plaats</button>
+              </div>
             </div>
           `;
 
           wrapEl.appendChild(card);
 
-          // tel async, blokkeer de page niet
-          (async () => {
-            const likes = await safeCount("likes", s.id);
-            const comments = await safeCount("comments", s.id);
-            const mini = document.getElementById(`mini-${s.id}`);
-            if (mini){
-              mini.innerHTML = `
-                <span>❤️ Likes: ${likes ?? "?"}</span>
-                <span>💬 Reacties: ${comments ?? "?"}</span>
-              `;
-            }
-          })();
+          // mini info vullen
+          renderMini(s.id);
         }
 
-      } catch(err) {
+      } catch(err){
         statusEl.textContent = "";
         errorEl.textContent = "❌ " + (err?.message || String(err));
       }
     }
 
-    // init
-    updateAuthButton();
-    loadStories();
+    // Klik-handlers (1x)
+    document.addEventListener("click", async (e) => {
+      const btn = e.target.closest("[data-action]");
+      if (!btn) return;
 
-    // auth state change -> update knop + reload stories
-    if (window.supabaseClient) {
-      window.supabaseClient.auth.onAuthStateChange(() => {
-        updateAuthButton();
-        loadStories();
-      });
-    }
+      const action = btn.getAttribute("data-action");
+      const id = btn.getAttribute("data-id");
+
+      if (action === "like"){
+        await toggleLike(id, btn);
+      }
+
+      if (action === "toggle-comments"){
+        const box = document.getElementById(`comments-${id}`);
+        if (!box) return;
+
+        const open = box.classList.toggle("open");
+        if (open) await loadComments(id);
+      }
+
+      if (action === "send-comment"){
+        const input = document.getElementById(`commentinput-${id}`);
+        await addComment(id, input, btn);
+      }
+
+      if (action === "delete"){
+        await deleteStory(id);
+      }
+    });
+
+    // Init
+    (async () => {
+      await loadStories();
+
+      if (window.supabaseClient){
+        window.supabaseClient.auth.onAuthStateChange(async () => {
+          await loadStories();
+        });
+      }
+    })();
 
     // back-cache fix
     window.addEventListener("pageshow", (e) => {
-      if (e.persisted) {
-        location.reload();
-        return;
-      }
-      updateAuthButton();
-      loadStories();
+      if (e.persisted) location.reload();
     });
   </script>
 </body>
