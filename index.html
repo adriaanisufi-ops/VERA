@@ -359,6 +359,7 @@
     async function loadStories() {
       const statusEl = document.getElementById("status");
       const errorEl = document.getElementById("error");
+      errorEl.textContent = "DEBUG: supabaseClient = " + (window.supabaseClient ? "OK" : "MISSING");
       const wrap = document.getElementById("stories");
 
       errorEl.textContent = "";
