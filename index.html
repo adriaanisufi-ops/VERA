@@ -10,6 +10,19 @@
   <link href="https://fonts.googleapis.com/css2?family=Inter:wght@400;600;700&display=swap" rel="stylesheet">
 
   <style>
+    .avatar{
+  width:42px;
+  height:42px;
+  border-radius:50%;
+  display:flex;
+  align-items:center;
+  justify-content:center;
+  font-weight:700;
+  font-size:16px;
+  color:white;
+  background: linear-gradient(135deg, #8b5cf6, #22d3ee);
+  flex-shrink:0;
+}
     :root{
       --bg:#0b1020;
       --card: rgba(255,255,255,.06);
@@ -474,14 +487,21 @@ setTimeout(() => btn.classList.remove("liked"), 450);
           const card = document.createElement("div");
           card.className = "card";
           card.innerHTML = `
-            <h2 class="title">${escapeHtml(s.title || "Zonder titel")}</h2>
-            <div class="meta">
-              <span>Door <b>${escapeHtml(s.author_name || "Anoniem")}</b></span>
-              <span>•</span>
-              <span>${formatDate(s.created_at)}</span>
-              <span>•</span>
-              <span>Categorie: <b>${escapeHtml(s.category || "Algemeen")}</b></span>
-            </div>
+        <div class="meta">
+  <div class="avatar">
+    ${escapeHtml((s.author_name || "A")[0].toUpperCase())}
+  </div>
+
+  <div>
+    <div><b>${escapeHtml(s.author_name || "Anoniem")}</b></div>
+    <div>${formatDate(s.created_at)}</div>
+    <div style="font-size:12px;opacity:.7">
+      Categorie: ${escapeHtml(s.category || "Algemeen")}
+    </div>
+  </div>
+</div>
+
+<h2 class="title">${escapeHtml(s.title || "Zonder titel")}</h2>
 
             <div class="content">${escapeHtml(s.content || "")}</div>
             ${tagsHtml}
