@@ -274,18 +274,18 @@ document.getElementById("catChips").addEventListener("click",e=>{
   }
 }
 
-// fix voor terug-knop / bfcache
-// init
+// 1️⃣ Bij eerste paginalaad
 updateAuthButton();
 loadStories();
 
+// 2️⃣ Als login / logout gebeurt
 window.supabaseClient.auth.onAuthStateChange(() => {
   updateAuthButton();
   loadStories();
 });
 
-// fix voor terug-knop / bfcache
-window.addEventListener("pageshow", (e) => {
+// 3️⃣ Als je via "terug" komt (browser cache)
+window.addEventListener("pageshow", () => {
   updateAuthButton();
   loadStories();
 });
