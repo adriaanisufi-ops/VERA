@@ -259,7 +259,36 @@ document.getElementById("catChips").addEventListener("click",e=>{
   c.classList.add("active"); activeCategory=c.dataset.cat; applyFilters();
 });
 
+  async function updateAuthButton(){
+  const authBtn = document.getElementById("authBtn");
+  if (!authBtn || !window.supabaseClient) return;
+
+  const { data: { user } } = await window.supabaseClient.auth.getUser();
+
+  if (user) {
+    authBtn.textContent = "Profiel";
+    authBtn.href = "profile.html";
+  } else {
+    authBtn.textContent = "Inloggen";
+    authBtn.href = "login.html";
+  }
+}
+
+// fix voor terug-knop / bfcache
+// init
+updateAuthButton();
 loadStories();
+
+window.supabaseClient.auth.onAuthStateChange(() => {
+  updateAuthButton();
+  loadStories();
+});
+
+// fix voor terug-knop / bfcache
+window.addEventListener("pageshow", (e) => {
+  updateAuthButton();
+  loadStories();
+});
 </script>
 </body>
 </html>
