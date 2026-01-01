@@ -7,57 +7,12 @@
 
   <link rel="preconnect" href="https://fonts.googleapis.com">
   <link rel="preconnect" href="https://fonts.gstatic.com" crossorigin>
-  <link href="https://fonts.googleapis.com/css2?family=Inter:wght@400;600;700&display=swap" rel="stylesheet">
+  <link href="https://fonts.googleapis.com/css2?family=Inter:wght@400;600;700;800;900&display=swap" rel="stylesheet">
 
   <style>
- 
-/* als je tags/badges ook te transparant zijn */
-.tag,
-.badge{
-  background: rgba(255,255,255,.10) !important;
-}
-    /* Mooie fade onderaan (voorkomt rare overlap/afsnij-look) */
-/* Mooie fade onderaan (maakt onderkant donkerder zodat gradient niet 'overlapt') */
-body{
-  background:
-    radial-gradient(1200px 600px at 15% 10%, rgba(139,92,246,.18), transparent 55%),
-    radial-gradient(900px 500px at 85% 20%, rgba(34,211,238,.22), transparent 55%),
-    radial-gradient(900px 500px at 50% 90%, rgba(251,113,133,.10), transparent 60%),
-    linear-gradient(
-      to bottom,
-      #0b1020 0%,
-      #0b1020 75%,
-      #080b18 100%
-    );
-}
-
-/* Zorg dat je content boven die overlay staat */
-.container{
-  position: relative;
-  z-index: 1;
-  padding-bottom: 180px; /* ruimte zodat laatste kaart niet 'in' de fade hangt */
-}
-
-/* Extra ruimte zodat content niet tegen de onderkant plakt */
-.container{
-  padding-bottom: 120px !important;
-}
-    .panda-side{
-  display:flex;
-  justify-content:center;
-  margin-bottom:14px;
-  opacity:.9;
-}
-
-.panda-side img{
-  width:120px;          /* groter */
-  height:auto;
-  filter: drop-shadow(0 10px 26px rgba(0,0,0,.55));
-}
     :root{
       --bg:#0b1020;
-      --bg2:#0f1732;
-     --card: rgba(15,23,50,.55);
+      --card: rgba(255,255,255,.06);
       --text:#eef2ff;
       --muted: rgba(238,242,255,.70);
       --border: rgba(255,255,255,.12);
@@ -68,77 +23,64 @@ body{
       --radius:18px;
       --shadow: 0 18px 60px rgba(0,0,0,.35);
     }
+
     *{box-sizing:border-box}
     html,body{height:100%}
+
+    /* ===== Background (smooth + geen rare balk) ===== */
     body{
-
-      /* Zachte donker-fade onderaan (maakt de onderkant overal gelijk) */
-body::before{
-  content:"";
-  position: fixed;
-  inset: 0;
-  pointer-events:none;
-  background: linear-gradient(
-    to bottom,
-    rgba(11,16,32,0) 55%,
-    rgba(11,16,32,.65) 82%,
-    rgba(11,16,32,1) 100%
-  );
-  z-index: 0;
-}
-
-/* Zorg dat je content boven de overlay blijft */
-.container{
-  position: relative;
-  z-index: 1;
-}
       margin:0;
       font-family: Inter, system-ui, -apple-system, Segoe UI, Roboto, Arial;
       color:var(--text);
-background:
-  radial-gradient(1200px 600px at 15% 10%, rgba(139,92,246,.30), transparent 55%),
-  radial-gradient(900px 500px at 85% 20%, rgba(34,211,238,.22), transparent 55%),
-  radial-gradient(900px 500px at 50% 90%, rgba(251,113,133,.10), transparent 60%),
-  radial-gradient(1200px 600px at 50% 95%, rgba(11,16,32,.95), transparent 65%),
-  var(--bg);
+      background: var(--bg);
       min-height:100vh;
+      position:relative;
+    }
+    body::before{
+      content:"";
+      position:fixed;
+      inset:0;
+      pointer-events:none;
+      z-index:0;
+      background:
+        radial-gradient(1200px 600px at 15% 10%, rgba(139,92,246,.30), transparent 55%),
+        radial-gradient(900px 500px at 85% 20%, rgba(34,211,238,.22), transparent 55%),
+        radial-gradient(900px 500px at 50% 90%, rgba(251,113,133,.10), transparent 60%);
+    }
+    body::after{
+      content:"";
+      position:fixed;
+      left:0; right:0; bottom:0;
+      height: 260px;
+      pointer-events:none;
+      z-index:0;
+      background: linear-gradient(
+        to bottom,
+        rgba(11,16,32,0) 0%,
+        rgba(11,16,32,.55) 45%,
+        rgba(11,16,32,1) 100%
+      );
     }
 
-    .container{max-width:1100px;margin:0 auto;padding:22px 16px 60px}
+    .container{
+      position:relative;
+      z-index:1;
+      max-width:1100px;
+      margin:0 auto;
+      padding:22px 16px 80px;
+    }
 
+    /* ===== Topbar ===== */
     .topbar{
       display:flex; gap:14px; align-items:center; justify-content:space-between;
-      padding:14px 16px; border:1px solid var(--border);
+      padding:14px 16px;
+      border:1px solid var(--border);
       background:rgba(255,255,255,.05);
       border-radius:22px;
       box-shadow: var(--shadow);
       backdrop-filter: blur(10px);
     }
-
     .brand-wrap{display:flex;align-items:center;gap:12px;min-width:0}
-.logo{
-  width:44px;
-  height:44px;
-  border-radius:999px;
-  overflow:hidden;
-
-  display:flex;
-  align-items:center;
-  justify-content:center;
-
-  background:#fff;
-  border: 1px solid rgba(255,255,255,.25);
-}
-    /* Yin-Yang draai animatie */
-.yy{
-  animation: spin 10s linear infinite;
-  transform-origin: 50% 50%;
-}
-
-@keyframes spin{
-  from { transform: rotate(0deg); }
-  to   { transform: rotate(360deg); }
-}
     .brand{min-width:0}
     .brand h1{margin:0;font-size:18px;line-height:1.1}
     .brand p{
@@ -147,18 +89,20 @@ background:
     }
 
     .actions{display:flex; gap:10px; align-items:center; flex-wrap:wrap; justify-content:flex-end}
+
     .btn{
       display:inline-flex; align-items:center; gap:8px;
       padding:10px 14px; border-radius:999px;
       border:1px solid var(--border);
       background:rgba(255,255,255,.06);
       color:var(--text); text-decoration:none;
-      font-weight:700; font-size:14px;
+      font-weight:800; font-size:14px;
       cursor:pointer;
       user-select:none;
     }
     .btn:hover{background:rgba(255,255,255,.09)}
     .btn:disabled{opacity:.6; cursor:not-allowed}
+
     .btn-primary{
       border:1px solid rgba(139,92,246,.35);
       background: linear-gradient(135deg, rgba(139,92,246,.95), rgba(34,211,238,.75));
@@ -170,11 +114,37 @@ background:
       color: #ffd7de;
     }
 
-    .status{margin:14px 6px 0;color:var(--muted);font-size:14px}
-    .error{margin:10px 6px 0;color:var(--danger);font-weight:800;white-space:pre-wrap}
-    .ok{margin:10px 6px 0;color:var(--ok);font-weight:800;white-space:pre-wrap}
+    /* ===== Yin Yang rotating logo ===== */
+    .logo{
+      width:52px;
+      height:52px;
+      border-radius:999px;
+      display:grid;
+      place-items:center;
+      background:rgba(255,255,255,.08);
+      border:1px solid rgba(255,255,255,.18);
+      overflow:hidden;
+      flex:0 0 auto;
+      box-shadow: 0 12px 30px rgba(0,0,0,.25);
+    }
+    .yy{
+      width:34px;
+      height:34px;
+      animation: spin 10s linear infinite;
+      transform-origin: 50% 50%;
+      opacity:.95;
+    }
+    @keyframes spin{
+      from{ transform: rotate(0deg); }
+      to{ transform: rotate(360deg); }
+    }
 
-    /* ====== Layout met sidebar ====== */
+    /* ===== Status / Messages ===== */
+    .status{margin:14px 6px 0;color:var(--muted);font-size:14px}
+    .error{margin:10px 6px 0;color:var(--danger);font-weight:900;white-space:pre-wrap}
+    .ok{margin:10px 6px 0;color:var(--ok);font-weight:900;white-space:pre-wrap}
+
+    /* ===== Layout with sidebar ===== */
     .layout{
       margin-top:16px;
       display:grid;
@@ -194,11 +164,34 @@ background:
       backdrop-filter: blur(10px);
     }
 
+    /* Panda groter + zichtbaar */
+    .panda-side{
+      display:flex;
+      justify-content:center;
+      margin-bottom:12px;
+    }
+    .panda-ring{
+      width:96px;
+      height:96px;
+      border-radius:999px;
+      background: rgba(0,0,0,.20);
+      border: 1px solid rgba(255,255,255,.16);
+      display:grid;
+      place-items:center;
+      box-shadow: 0 14px 35px rgba(0,0,0,.35);
+    }
+    .panda-side img{
+      width:74px;
+      height:auto;
+      display:block;
+      filter: drop-shadow(0 10px 18px rgba(0,0,0,.55));
+    }
+
     .sb-title{
       margin: 0 0 10px;
       font-size: 14px;
       color: var(--muted);
-      font-weight: 800;
+      font-weight: 900;
       letter-spacing: .2px;
     }
 
@@ -214,9 +207,10 @@ background:
     .input::placeholder{ color: rgba(238,242,255,.55); }
 
     .sb-group{ margin-top: 12px; display:flex; flex-direction:column; gap:8px; }
-    .sb-small{ font-weight:700; color: rgba(238,242,255,.65); font-size:12px; }
+    .sb-small{ font-weight:800; color: rgba(238,242,255,.65); font-size:12px; }
 
     .sb-chip{
+      width:100%;
       display:flex;
       align-items:center;
       justify-content:space-between;
@@ -228,7 +222,7 @@ background:
       color: var(--text);
       cursor:pointer;
       user-select:none;
-      font-weight:800;
+      font-weight:900;
       font-size: 13px;
     }
     .sb-chip:hover{ background: rgba(255,255,255,.07); }
@@ -237,7 +231,7 @@ background:
       box-shadow: 0 0 0 2px rgba(139,92,246,.12);
     }
 
-    /* ====== Cards ====== */
+    /* ===== Cards ===== */
     .grid{display:grid;gap:14px}
     .card{
       background:var(--card);
@@ -255,8 +249,8 @@ background:
     }
     .card:active{ transform: translateY(-2px) scale(0.99); }
 
-    .meta{display:flex;flex-wrap:wrap;gap:10px;align-items:center;color:var(--muted);font-size:13px;margin-top:6px}
     .meta2{display:flex;gap:12px;align-items:center}
+    .meta{display:flex;flex-wrap:wrap;gap:10px;align-items:center;color:var(--muted);font-size:13px;margin-top:6px}
 
     .avatar{
       width:34px;height:34px;border-radius:999px;
@@ -268,7 +262,7 @@ background:
       flex:0 0 auto;
     }
 
-    .title{margin:6px 0 0;font-size:16px}
+    .title{margin:10px 0 0;font-size:16px}
     .content{margin:10px 0 0;white-space:pre-wrap;line-height:1.65}
 
     .tags{display:flex;gap:8px;flex-wrap:wrap;margin-top:10px}
@@ -286,7 +280,7 @@ background:
       border:1px solid rgba(255,255,255,.14);
       background:rgba(255,255,255,.06);
       color:rgba(238,242,255,.9);
-      font-weight:800;
+      font-weight:900;
     }
     .badge.cat-algemeen{ border-color: rgba(139,92,246,.40); box-shadow:0 0 0 2px rgba(139,92,246,.10); }
     .badge.cat-filosofie{ border-color: rgba(34,211,238,.40); box-shadow:0 0 0 2px rgba(34,211,238,.10); }
@@ -327,10 +321,13 @@ background:
     .c-form{display:flex;gap:10px;margin-top:10px}
     .c-form .input{flex:1}
 
-    /* mobiel: sidebar boven content */
     @media (max-width: 860px){
       .layout{ grid-template-columns: 1fr; }
       .sidebar{ position: relative; top: 0; }
+      .logo{ width:48px; height:48px; }
+      .yy{ width:32px; height:32px; }
+      .panda-ring{ width:88px; height:88px; }
+      .panda-side img{ width:68px; }
     }
   </style>
 </head>
@@ -340,17 +337,17 @@ background:
 
     <div class="topbar">
       <div class="brand-wrap">
-        <!-- Panda logo -->
-<a class="logo" href="./index.html" title="Verhalen">
-  <svg class="yy" viewBox="0 0 100 100" width="40" height="40" aria-hidden="true">
-    <circle cx="50" cy="50" r="48" fill="white"/>
-    <path d="M50 2 a48 48 0 1 0 0 96
-             a24 24 0 1 1 0-48
-             a24 24 0 1 0 0-48" fill="black"/>
-    <circle cx="50" cy="26" r="6" fill="white"/>
-    <circle cx="50" cy="74" r="6" fill="black"/>
-  </svg>
-</a>
+        <a class="logo" href="./index.html" title="Yin & Yang">
+          <svg class="yy" viewBox="0 0 100 100" aria-hidden="true">
+            <circle cx="50" cy="50" r="48" fill="white"/>
+            <path d="M50 2 a48 48 0 1 0 0 96
+                     a24 24 0 1 1 0-48
+                     a24 24 0 1 0 0-48" fill="black"/>
+            <circle cx="50" cy="26" r="6" fill="white"/>
+            <circle cx="50" cy="74" r="6" fill="black"/>
+          </svg>
+        </a>
+
         <div class="brand">
           <h1>Verhalen</h1>
           <p>Lees, deel, like en reageer — met respect.</p>
@@ -363,37 +360,36 @@ background:
       </div>
     </div>
 
-   <div id="status" class="status"></div>
+    <div id="status" class="status">Verhalen laden…</div>
     <div id="error" class="error"></div>
     <div id="ok" class="ok"></div>
 
     <div class="layout">
-  <aside class="sidebar">
+      <aside class="sidebar">
+        <div class="panda-side">
+          <div class="panda-ring">
+            <img src="./panda.png" alt="Panda">
+          </div>
+        </div>
 
-  <!-- 🐼 Panda mascotte -->
-  <div class="panda-side">
-    <img src="./panda.png" alt="Panda">
-  </div>
+        <div class="sb-title">Ontdekken</div>
 
-  <div class="sb-title">Ontdekken</div>
+        <input id="q" class="input" placeholder="Zoek verhalen..." />
 
-<input id="q" class="input" placeholder="Zoek verhalen..." />
+        <div id="catGroup" class="sb-group">
+          <button type="button" class="sb-chip active" data-cat="Alle">Alle</button>
+          <button type="button" class="sb-chip" data-cat="Algemeen">Algemeen</button>
+          <button type="button" class="sb-chip" data-cat="Filosofie">Filosofie</button>
+          <button type="button" class="sb-chip" data-cat="Persoonlijk">Persoonlijk</button>
+          <button type="button" class="sb-chip" data-cat="Poëzie">Poëzie</button>
+        </div>
 
-<div class="sb-group" id="catGroup">
-  <div class="sb-chip active" data-cat="Alle">Alle</div>
-  <div class="sb-chip" data-cat="Algemeen">Algemeen</div>
-  <div class="sb-chip" data-cat="Filosofie">Filosofie</div>
-  <div class="sb-chip" data-cat="Persoonlijk">Persoonlijk</div>
-  <div class="sb-chip" data-cat="Poëzie">Poëzie</div>
-</div>
-
- <div class="sb-group" id="sortGroup">
-  <div class="sb-small">Sorteren</div>
-  <div class="sb-chip" data-sort="top">❤️ Meest geliket</div>
-  <div class="sb-chip active" data-sort="new">🕒 Nieuwste</div>
-</div>
-
-</aside>
+        <div id="sortGroup" class="sb-group">
+          <div class="sb-small">Sorteren</div>
+          <button type="button" class="sb-chip" data-sort="top">❤️ Meest geliket</button>
+          <button type="button" class="sb-chip active" data-sort="new">🕒 Nieuwste</button>
+        </div>
+      </aside>
 
       <div id="stories" class="grid"></div>
     </div>
@@ -404,7 +400,7 @@ background:
   <script src="supabase.js"></script>
 
   <script>
-    // ===== Globals =====
+    // ===== Elements =====
     const statusEl = document.getElementById("status");
     const errorEl  = document.getElementById("error");
     const okEl     = document.getElementById("ok");
@@ -414,6 +410,7 @@ background:
     const catGroup = document.getElementById("catGroup");
     const sortGroup = document.getElementById("sortGroup");
 
+    // ===== State =====
     let CURRENT_USER = null;
     let ALL_STORIES = [];
     let activeCategory = "Alle";
@@ -465,7 +462,6 @@ background:
         return;
       }
 
-      // gebruik CURRENT_USER als die al gezet is, anders ophalen
       const user = CURRENT_USER || (await refreshUser());
 
       if (user){
@@ -477,16 +473,7 @@ background:
       }
     }
 
-    // ===== Data helpers =====
-    async function count(table, storyId){
-      const { count, error } = await window.supabaseClient
-        .from(table)
-        .select("*", { count:"exact", head:true })
-        .eq("story_id", storyId);
-      if (error) return 0;
-      return count ?? 0;
-    }
-
+    // ===== Data =====
     async function didILike(storyId){
       if (!CURRENT_USER) return false;
       const { data, error } = await window.supabaseClient
@@ -503,7 +490,6 @@ background:
     async function toggleLike(storyId, btn){
       setErr(""); okEl.textContent = "";
 
-      // animatie direct (ook als hij daarna faalt)
       btn.classList.remove("liked"); void btn.offsetWidth; btn.classList.add("liked");
       setTimeout(() => btn.classList.remove("liked"), 450);
 
@@ -529,7 +515,7 @@ background:
           if (error) throw error;
         }
 
-        await refreshMini(storyId);
+        await loadStories(true);
       }catch(err){
         setErr("❌ " + (err?.message || String(err)));
       }finally{
@@ -538,9 +524,8 @@ background:
     }
 
     async function loadComments(storyId){
-      const box = document.getElementById("comments-"+storyId);
       const list = document.getElementById("c-list-"+storyId);
-      if (!box || !list) return;
+      if (!list) return;
 
       list.innerHTML = `<div class="c-meta">Laden…</div>`;
 
@@ -600,7 +585,6 @@ background:
       input.disabled = true;
 
       try{
-        // naam: eerst user_metadata.full_name als die bestaat, anders email prefix
         const name =
           (CURRENT_USER.user_metadata && (CURRENT_USER.user_metadata.full_name || CURRENT_USER.user_metadata.name)) ||
           (CURRENT_USER.email ? CURRENT_USER.email.split("@")[0] : "Gebruiker");
@@ -618,9 +602,7 @@ background:
 
         input.value = "";
         setOk("✅ Reactie geplaatst!");
-        await loadComments(storyId);
-        await refreshMini(storyId);
-
+        await loadStories(true);
       }catch(err){
         setErr("❌ " + (err?.message || String(err)));
       }finally{
@@ -635,7 +617,6 @@ background:
         setErr("❌ Log in om te verwijderen.");
         return;
       }
-
       if (!confirm("Weet je zeker dat je dit verhaal wilt verwijderen?")) return;
 
       try{
@@ -648,30 +629,15 @@ background:
         if (error) throw error;
 
         setOk("✅ Verhaal verwijderd.");
-        await loadStories(); // reload alles
+        await loadStories();
       }catch(err){
-        setErr("❌ " + (err?.message || String(err)) + "\nTip: als je een fout krijgt, moeten likes/comments misschien cascade in de database.");
+        setErr("❌ " + (err?.message || String(err)));
       }
     }
 
-    async function refreshMini(storyId){
-      const mini = document.getElementById("mini-"+storyId);
-      if (!mini) return;
-
-      const likes = await count("likes", storyId);
-      const comments = await count("comments", storyId);
-
-      const likeHint = CURRENT_USER ? "" : " (log in om te liken)";
-      mini.innerHTML = `
-        <span>❤️ Likes: ${likes}</span>
-        <span>💬 Reacties: ${comments}${likeHint}</span>
-      `;
-    }
-
-    // ===== Rendering + Filters =====
+    // ===== Filters + Render =====
     function applyFilters(){
       const q = (activeQuery || "").toLowerCase();
-
       let list = [...ALL_STORIES];
 
       if (activeCategory && activeCategory !== "Alle"){
@@ -689,10 +655,8 @@ background:
       }
 
       if (activeSort === "top"){
-        // sorteer op like_count (meegegeven bij loadStories)
         list.sort((a,b) => (b.like_count||0) - (a.like_count||0));
       }else{
-        // newest
         list.sort((a,b) => new Date(b.created_at) - new Date(a.created_at));
       }
 
@@ -740,8 +704,8 @@ background:
           <div class="divider"></div>
 
           <div class="mini" id="mini-${s.id}">
-            <span>❤️ Likes: ${s.like_count ?? "…"}</span>
-            <span>💬 Reacties: ${s.comment_count ?? "…"}</span>
+            <span>❤️ Likes: ${s.like_count ?? 0}</span>
+            <span>💬 Reacties: ${s.comment_count ?? 0}</span>
             ${CURRENT_USER ? "" : `<span style="opacity:.75">(log in om te liken/reageren)</span>`}
           </div>
 
@@ -766,116 +730,111 @@ background:
       }
     }
 
-   async function loadStories(){
-  setErr(""); okEl.textContent = "";
-  statusEl.textContent = "Verhalen laden…";
-  wrapEl.innerHTML = "";
+    async function loadStories(keepStatus=false){
+      setErr(""); okEl.textContent = "";
+      if (!keepStatus) statusEl.textContent = "Verhalen laden…";
 
-  try{
-    if (!window.supabaseClient){
-      throw new Error("Supabase client niet geladen. Check supabase.js.");
+      try{
+        if (!window.supabaseClient){
+          throw new Error("Supabase client niet geladen. Check supabase.js.");
+        }
+
+        const { data: stories, error } = await window.supabaseClient
+          .from("stories")
+          .select("id,user_id,title,content,author_name,created_at,category,tags")
+          .order("created_at", { ascending:false })
+          .limit(100);
+
+        if (error) throw error;
+
+        if (!stories || stories.length === 0){
+          statusEl.textContent = "Nog geen verhalen. Klik op ‘Deel jouw verhaal’ om de eerste te plaatsen.";
+          ALL_STORIES = [];
+          wrapEl.innerHTML = "";
+          return;
+        }
+
+        const ids = stories.map(s => s.id);
+
+        const { data: likesData, error: lErr } = await window.supabaseClient
+          .from("likes")
+          .select("story_id")
+          .in("story_id", ids);
+
+        if (lErr) throw lErr;
+
+        const likeMap = new Map();
+        for (const r of (likesData || [])){
+          likeMap.set(r.story_id, (likeMap.get(r.story_id) || 0) + 1);
+        }
+
+        const { data: comData, error: cErr } = await window.supabaseClient
+          .from("comments")
+          .select("story_id")
+          .in("story_id", ids);
+
+        if (cErr) throw cErr;
+
+        const comMap = new Map();
+        for (const r of (comData || [])){
+          comMap.set(r.story_id, (comMap.get(r.story_id) || 0) + 1);
+        }
+
+        ALL_STORIES = stories.map(s => ({
+          ...s,
+          like_count: likeMap.get(s.id) || 0,
+          comment_count: comMap.get(s.id) || 0
+        }));
+
+        statusEl.textContent = "";
+        applyFilters();
+
+      }catch(err){
+        statusEl.textContent = "";
+        setErr("❌ " + (err?.message || String(err)));
+      }
     }
 
-    const { data: stories, error } = await window.supabaseClient
-      .from("stories")
-      .select("id,user_id,title,content,author_name,created_at,category,tags")
-      .order("created_at", { ascending:false })
-      .limit(100);
-
-    if (error) throw error;
-
-    if (!stories || stories.length === 0){
-      statusEl.textContent = "Nog geen verhalen. Klik op ‘Deel jouw verhaal’ om de eerste te plaatsen.";
-      ALL_STORIES = [];
-      return;
+    // ===== Sidebar interactions (veilig) =====
+    if (qEl){
+      qEl.addEventListener("input", () => {
+        activeQuery = qEl.value || "";
+        applyFilters();
+      });
     }
 
-    const ids = stories.map(s => s.id);
-
-    // ✅ Likes: als RLS het blokkeert -> niet crashen, gewoon 0 likes tonen
-    let likesData = [];
-    const likesRes = await window.supabaseClient
-      .from("likes")
-      .select("story_id")
-      .in("story_id", ids);
-
-    if (!likesRes.error && Array.isArray(likesRes.data)) {
-      likesData = likesRes.data;
+    if (catGroup){
+      catGroup.addEventListener("click", (e) => {
+        const chip = e.target.closest(".sb-chip");
+        if (!chip) return;
+        catGroup.querySelectorAll(".sb-chip").forEach(x => x.classList.remove("active"));
+        chip.classList.add("active");
+        activeCategory = chip.dataset.cat || "Alle";
+        applyFilters();
+      });
     }
 
-    const likeMap = new Map();
-    for (const r of likesData){
-      likeMap.set(r.story_id, (likeMap.get(r.story_id) || 0) + 1);
+    if (sortGroup){
+      sortGroup.addEventListener("click", (e) => {
+        const chip = e.target.closest(".sb-chip");
+        if (!chip) return;
+        sortGroup.querySelectorAll(".sb-chip").forEach(x => x.classList.remove("active"));
+        chip.classList.add("active");
+        activeSort = chip.dataset.sort || "new";
+        applyFilters();
+      });
     }
 
-    // ✅ Comments: idem
-    let comData = [];
-    const comRes = await window.supabaseClient
-      .from("comments")
-      .select("story_id")
-      .in("story_id", ids);
-
-    if (!comRes.error && Array.isArray(comRes.data)) {
-      comData = comRes.data;
-    }
-
-    const comMap = new Map();
-    for (const r of comData){
-      comMap.set(r.story_id, (comMap.get(r.story_id) || 0) + 1);
-    }
-
-    ALL_STORIES = stories.map(s => ({
-      ...s,
-      like_count: likeMap.get(s.id) || 0,
-      comment_count: comMap.get(s.id) || 0
-    }));
-
-    statusEl.textContent = "";
-    applyFilters();
-
-  }catch(err){
-    statusEl.textContent = "";
-    setErr("❌ " + (err?.message || String(err)));
-  }
-}
-
-    // ===== Sidebar interactions =====
-    qEl.addEventListener("input", () => {
-      activeQuery = qEl.value || "";
-      applyFilters();
-    });
-
-    catGroup.addEventListener("click", (e) => {
-      const chip = e.target.closest(".sb-chip");
-      if (!chip) return;
-      document.querySelectorAll("#catGroup .sb-chip").forEach(x => x.classList.remove("active"));
-      chip.classList.add("active");
-      activeCategory = chip.dataset.cat || "Alle";
-      applyFilters();
-    });
-
-    sortGroup.addEventListener("click", (e) => {
-      const chip = e.target.closest(".sb-chip");
-      if (!chip) return;
-      document.querySelectorAll("#sortGroup .sb-chip").forEach(x => x.classList.remove("active"));
-      chip.classList.add("active");
-      activeSort = chip.dataset.sort || "new";
-      applyFilters();
-    });
-
-    // ===== Buttons (Like / Reacties / Delete) =====
+    // ===== Buttons =====
     document.addEventListener("click", async (e) => {
       const btn = e.target.closest("button[data-action]");
       if (!btn) return;
 
       const action = btn.dataset.action;
       const storyId = btn.dataset.id;
-
       if (!storyId) return;
 
-      if (action === "like") {
-        return toggleLike(storyId, btn);
-      }
+      if (action === "like") return toggleLike(storyId, btn);
 
       if (action === "toggle-comments") {
         const box = document.getElementById("comments-"+storyId);
@@ -887,16 +846,11 @@ background:
         return;
       }
 
-      if (action === "send-comment") {
-        return addComment(storyId);
-      }
-
-      if (action === "delete") {
-        return deleteStory(storyId);
-      }
+      if (action === "send-comment") return addComment(storyId);
+      if (action === "delete") return deleteStory(storyId);
     });
 
-    // ===== Init / auth / back-cache =====
+    // ===== Init =====
     (async () => {
       await refreshUser();
       await updateAuthButton();
@@ -912,10 +866,9 @@ background:
     })();
 
     window.addEventListener("pageshow", async () => {
-      // als je via "terug" komt, zorg dat alles opnieuw klopt
       await refreshUser();
       await updateAuthButton();
-      await loadStories();
+      await loadStories(true);
     });
   </script>
 </body>
