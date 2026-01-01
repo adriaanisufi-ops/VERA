@@ -11,17 +11,30 @@
 
   <style>
     /* Mooie fade onderaan (voorkomt rare overlap/afsnij-look) */
+/* Mooie fade onderaan (maakt onderkant donkerder zodat gradient niet 'overlapt') */
 body::after{
   content:"";
   position: fixed;
   left:0; right:0; bottom:0;
-  height: 140px;
+  height: 320px;               /* hoger */
   pointer-events:none;
-  background: linear-gradient(to bottom,
-    rgba(11,16,32,0),
-    rgba(11,16,32,.65),
-    rgba(11,16,32,1)
+  z-index: 0;
+
+  /* sterker en eerder donker */
+  background: linear-gradient(
+    to bottom,
+    rgba(11,16,32,0) 0%,
+    rgba(11,16,32,.55) 35%,
+    rgba(11,16,32,.85) 70%,
+    rgba(11,16,32,1) 100%
   );
+}
+
+/* Zorg dat je content boven die overlay staat */
+.container{
+  position: relative;
+  z-index: 1;
+  padding-bottom: 180px; /* ruimte zodat laatste kaart niet 'in' de fade hangt */
 }
 
 /* Extra ruimte zodat content niet tegen de onderkant plakt */
