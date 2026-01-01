@@ -50,27 +50,32 @@
     }
 
     .brand-wrap{display:flex;align-items:center;gap:12px;min-width:0}
-    .logo{
-      width:38px;height:38px;border-radius:999px;
-      display:grid;place-items:center;
-      background:rgba(255,255,255,.08);
-      border:1px solid rgba(255,255,255,.14);
-      flex:0 0 auto;
-      overflow:hidden;
-    }
-    .logo img{
-  width:100%;
-  height:100%;
-  object-fit:contain;
-  filter: drop-shadow(0 2px 6px rgba(0,0,0,.35));
-}
-    .logo img{
-  transition: transform .25s ease, filter .25s ease;
-}
+.logo{
+  width:44px;
+  height:44px;
+  border-radius:999px;
+  overflow:hidden;
 
-.logo:hover img{
-  transform: scale(1.06);
-  filter: drop-shadow(0 4px 12px rgba(0,0,0,.45));
+  display:flex;
+  align-items:center;
+  justify-content:center;
+
+  /* 🔥 dit maakt de panda zichtbaar */
+  background: radial-gradient(
+    circle at 30% 30%,
+    rgba(255,255,255,.35),
+    rgba(255,255,255,.12) 60%,
+    rgba(0,0,0,.2)
+  );
+
+  border: 1px solid rgba(255,255,255,.25);
+  box-shadow: 0 6px 18px rgba(0,0,0,.35);
+}
+.logo img{
+  width:85%;
+  height:85%;
+  object-fit:contain;
+  display:block;
 }
     .brand{min-width:0}
     .brand h1{margin:0;font-size:18px;line-height:1.1}
