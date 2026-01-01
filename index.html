@@ -58,6 +58,20 @@
       flex:0 0 auto;
       overflow:hidden;
     }
+    .logo img{
+  width:100%;
+  height:100%;
+  object-fit:contain;
+  filter: drop-shadow(0 2px 6px rgba(0,0,0,.35));
+}
+    .logo img{
+  transition: transform .25s ease, filter .25s ease;
+}
+
+.logo:hover img{
+  transform: scale(1.06);
+  filter: drop-shadow(0 4px 12px rgba(0,0,0,.45));
+}
     .brand{min-width:0}
     .brand h1{margin:0;font-size:18px;line-height:1.1}
     .brand p{
@@ -260,22 +274,9 @@
     <div class="topbar">
       <div class="brand-wrap">
         <!-- Panda logo -->
-        <div class="logo" title="Panda">
-          <svg viewBox="0 0 64 64" width="26" height="26" aria-hidden="true">
-            <circle cx="18" cy="16" r="10" fill="#111827"/>
-            <circle cx="46" cy="16" r="10" fill="#111827"/>
-            <circle cx="32" cy="34" r="22" fill="#F9FAFB"/>
-            <ellipse cx="24" cy="34" rx="8" ry="10" fill="#111827"/>
-            <ellipse cx="40" cy="34" rx="8" ry="10" fill="#111827"/>
-            <circle cx="24" cy="34" r="3" fill="#F9FAFB"/>
-            <circle cx="40" cy="34" r="3" fill="#F9FAFB"/>
-            <circle cx="24" cy="34" r="1.2" fill="#111827"/>
-            <circle cx="40" cy="34" r="1.2" fill="#111827"/>
-            <path d="M29 41c2 2 4 2 6 0" stroke="#111827" stroke-width="2.5" fill="none" stroke-linecap="round"/>
-            <path d="M30 38c1.5 1.3 2.5 1.3 4 0" stroke="#111827" stroke-width="3" fill="none" stroke-linecap="round"/>
-          </svg>
-        </div>
-
+    <a class="logo" href="./index.html" title="Verhalen">
+  <img src="./panda.png" alt="Panda logo">
+</a>
         <div class="brand">
           <h1>Verhalen</h1>
           <p>Lees, deel, like en reageer — met respect.</p>
