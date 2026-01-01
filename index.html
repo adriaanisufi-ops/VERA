@@ -291,32 +291,32 @@
     <div id="ok" class="ok"></div>
 
     <div class="layout">
-      <aside class="sidebar">
-        <div class="sb-title">Ontdekken</div>
+  <aside class="sidebar">
 
-        <input id="q" class="input" placeholder="Zoek verhalen…" />
+  <!-- 🐼 Panda mascotte -->
+  <div class="panda-side">
+    <img src="./panda.png" alt="Panda">
+  </div>
 
-        <div class="sb-group" id="catGroup">
-          <div class="sb-chip active" data-cat="Alle">Alle</div>
-          <div class="sb-chip" data-cat="Algemeen">Algemeen</div>
-          <div class="sb-chip" data-cat="Filosofie">Filosofie</div>
-          <div class="sb-chip" data-cat="Persoonlijk">Persoonlijk</div>
-          <div class="sb-chip" data-cat="Poëzie">Poëzie</div>
-        </div>
+  <div class="sb-title">Ontdekken</div>
 
-        <div class="sb-group" id="sortGroup" style="margin-top:14px">
-          <div class="sb-small">Sorteren</div>
-          <div class="sb-chip active" data-sort="new">🕒 Nieuwste</div>
-          <div class="sb-chip" data-sort="top">❤️ Meest geliket</div>
-        </div>
+  <input class="input" placeholder="Zoek verhalen..." />
 
-        <div class="sb-group" style="margin-top:14px">
-          <div class="sb-small">Tip</div>
-          <div style="font-size:12px;color:rgba(238,242,255,.65);line-height:1.5">
-            Klik op <b>Reacties</b> om een thread te openen. Likes & reacties werken pas als je bent ingelogd.
-          </div>
-        </div>
-      </aside>
+  <div class="sb-group">
+    <div class="sb-chip active">Alle</div>
+    <div class="sb-chip">Algemeen</div>
+    <div class="sb-chip">Filosofie</div>
+    <div class="sb-chip">Persoonlijk</div>
+    <div class="sb-chip">Poëzie</div>
+  </div>
+
+  <div class="sb-group">
+    <div class="sb-small">Sorteren</div>
+    <div class="sb-chip">❤️ Meest geliket</div>
+    <div class="sb-chip">🕒 Nieuwste</div>
+  </div>
+
+</aside>
 
       <div id="stories" class="grid"></div>
     </div>
