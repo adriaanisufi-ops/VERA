@@ -312,21 +312,21 @@
 
   <div class="sb-title">Ontdekken</div>
 
-  <input class="input" placeholder="Zoek verhalen..." />
+<input id="q" class="input" placeholder="Zoek verhalen..." />
 
-  <div class="sb-group">
-    <div class="sb-chip active">Alle</div>
-    <div class="sb-chip">Algemeen</div>
-    <div class="sb-chip">Filosofie</div>
-    <div class="sb-chip">Persoonlijk</div>
-    <div class="sb-chip">Poëzie</div>
-  </div>
+<div class="sb-group" id="catGroup">
+  <div class="sb-chip active" data-cat="Alle">Alle</div>
+  <div class="sb-chip" data-cat="Algemeen">Algemeen</div>
+  <div class="sb-chip" data-cat="Filosofie">Filosofie</div>
+  <div class="sb-chip" data-cat="Persoonlijk">Persoonlijk</div>
+  <div class="sb-chip" data-cat="Poëzie">Poëzie</div>
+</div>
 
-  <div class="sb-group">
-    <div class="sb-small">Sorteren</div>
-    <div class="sb-chip">❤️ Meest geliket</div>
-    <div class="sb-chip">🕒 Nieuwste</div>
-  </div>
+ <div class="sb-group" id="sortGroup">
+  <div class="sb-small">Sorteren</div>
+  <div class="sb-chip" data-sort="top">❤️ Meest geliket</div>
+  <div class="sb-chip active" data-sort="new">🕒 Nieuwste</div>
+</div>
 
 </aside>
 
