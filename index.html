@@ -10,17 +10,36 @@
   <link href="https://fonts.googleapis.com/css2?family=Inter:wght@400;600;700&display=swap" rel="stylesheet">
 
   <style>
+    /* FORCE FIX: voorkom dat achtergrond door cards heen lekt */
+    .card,
+.sidebar,
+.topbar{
+  position: relative;
+  z-index: 2;
+}
+.card,
+.sidebar,
+.topbar{
+  background: rgba(15, 23, 50, .88) !important;
+}
+
+/* als je tags/badges ook te transparant zijn */
+.tag,
+.badge{
+  background: rgba(255,255,255,.10) !important;
+}
     /* Mooie fade onderaan (voorkomt rare overlap/afsnij-look) */
 /* Mooie fade onderaan (maakt onderkant donkerder zodat gradient niet 'overlapt') */
 body::after{
   content:"";
   position: fixed;
-  left:0; right:0; bottom:0;
-  height: 320px;               /* hoger */
-  pointer-events:none;
-  z-index: 0;
+  left:0;
+  right:0;
+  bottom:0;
+  height: 320px;
+  pointer-events: none;
 
-  /* sterker en eerder donker */
+  /* donkere fade onderaan */
   background: linear-gradient(
     to bottom,
     rgba(11,16,32,0) 0%,
@@ -28,6 +47,8 @@ body::after{
     rgba(11,16,32,.85) 70%,
     rgba(11,16,32,1) 100%
   );
+
+  z-index: 0; /* 👈 BELANGRIJK */
 }
 
 /* Zorg dat je content boven die overlay staat */
